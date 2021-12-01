@@ -1,0 +1,27 @@
+{
+  "name": "smokey-be",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salza323/smokey-BE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/salza323/smokey-BE/issues"
+  },
+  "homepage": "https://github.com/salza323/smokey-BE#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "knex": "^0.95.14",
+    "nodemon": "^2.0.15",
+    "sqlite3": "^5.0.2"
+  }
+}
