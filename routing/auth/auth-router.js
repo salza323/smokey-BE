@@ -11,9 +11,9 @@ const { unsubscribe } = require('../api/server');
 //register a new user with email, username, & password. then respond to client with addedUser for confirmation
 router.post('/register', async (req, res) => {
   try {
-    const { first_name, last_name, email, username, password } = req.body;
+    const { email, username, location, favCooker, password } = req.body;
     const hash = bcrypt.hashSync(password, 10);
-    const user = { first_name, last_name, email, username, password: hash };
+    const user = { email, username, location, favCooker, password: hash };
     const addedUser = await Users.add(user);
     res.status(201).json(addedUser);
   } catch (err) {
