@@ -19,9 +19,16 @@
   },
   "homepage": "https://github.com/salza323/smokey-BE#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^0.95.14",
     "nodemon": "^2.0.15",
+    "pg": "^8.7.1",
     "sqlite3": "^5.0.2"
   }
 }
