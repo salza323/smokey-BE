@@ -1,4 +1,4 @@
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const router = require('express').Router();
 
@@ -6,7 +6,7 @@ const Users = require('../users/users-model');
 
 // pull in the secret we'll use to make the JWT
 const { jwtSecret } = require('./secrets.js');
-const { unsubscribe } = require('../api/server');
+const { unsubscribe } = require('../../api/server');
 
 //register a new user with email, username, & password. then respond to client with addedUser for confirmation
 router.post('/register', async (req, res) => {
