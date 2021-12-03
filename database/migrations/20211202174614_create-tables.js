@@ -13,14 +13,6 @@ exports.up = function (knex) {
       tbl.increments();
       tbl.string('recipe_name', 128).notNullable();
       tbl
-        .integer('ingredients')
-        .notNullable()
-        .unsigned()
-        .references('id')
-        .inTable('ingredients')
-        .onDelete('CASCADE')
-        .onUpdate('CASCADE');
-      tbl
         .integer('creator_id')
         .notNullable()
         .unsigned()
@@ -30,6 +22,7 @@ exports.up = function (knex) {
         .onUpdate('CASCADE');
       tbl.integer('likes');
     })
+
     .createTable('user_recipes_follows', (tbl) => {
       tbl.increments();
       tbl
@@ -49,6 +42,7 @@ exports.up = function (knex) {
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
     })
+
     .createTable('steps', (tbl) => {
       tbl.increments();
       tbl
@@ -63,6 +57,7 @@ exports.up = function (knex) {
       tbl.integer('step_temperature_in_fahrenheit').notNullable();
       tbl.string('step_instruction').notNullable();
     })
+
     .createTable('ingredients', (tbl) => {
       tbl.increments();
       tbl
