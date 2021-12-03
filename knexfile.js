@@ -3,14 +3,13 @@ module.exports = {
     client: 'sqlite3',
     useNullAsDefault: true, // needed for sqlite
     connection: {
-      // TODO, add db name once configured
-      filename: './data/smokey.db3',
+      filename: './database/smokey.db3',
     },
     migrations: {
-      directory: './data/migrations',
+      directory: './database/migrations',
     },
     seeds: {
-      directory: './data/seeds',
+      directory: './database/seeds',
     },
     pool: {
       afterCreate: (conn, done) => {
