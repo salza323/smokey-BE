@@ -11,26 +11,27 @@ module.exports = {
 
 // POST a new recipe
 // helper functions for creating ingredient and steps lists
-async function createStepList(steps, recipeId) {
-  await db('steps').insert(
-    steps.map((step) => {
+async function createIngredientList(ingredients, recipeId) {
+  await db('ingredients').insert(
+    ingredients.map((ingredient) => {
+      console.log(ingredient);
       return {
         recipe_id: recipeId,
-        step_number: step.stepNumber,
-        step_temperature_in_fahrenheit: step.stepTemperatureInFahrenheit,
-        step_instruction: step.stepInstruction,
+        ingredient_name: ingredient.ingredient_name,
+        ingredient_quantity: ingredient.ingredient_quantity,
       };
     })
   );
 }
 
-async function createIngredientList(ingredients, recipeId) {
-  await db('ingredients').insert(
-    ingredients.map((ingredient) => {
+async function createStepList(steps, recipeId) {
+  await db('steps').insert(
+    steps.map((step) => {
       return {
         recipe_id: recipeId,
-        ingredient_name: ingredient.ingredientName,
-        ingredient_quantity: ingredient.ingredientQuantity,
+        step_number: step.step_number,
+        step_temperature_in_fahrenheit: step.step_temperature_in_fahrenheit,
+        step_instruction: step.step_instruction,
       };
     })
   );
@@ -41,8 +42,10 @@ async function createNewRecipe(newRecipe, ingredients, steps) {
   const [id] = await db('recipes').insert(newRecipe);
 
   // call helper functions to build out step and ingredient table columns.
-  createStepList(steps, id);
   createIngredientList(ingredients, id);
+  createStepList(steps, id);
+
+  return getRecipe(id);
 }
 
 // -----------------------------------------------------
