@@ -26,8 +26,9 @@ router.post('/create-recipe', restricted, (req, res) => {
 });
 
 // GET a recipe with id passed in params
-router.get('retirive-recipe/:id', restricted, (req, res) => {
-  const { recipeId } = req.params.id;
+router.get('/retirive-recipe/:id', restricted, (req, res) => {
+  const recipeId = req.params.id;
+
   Recipes.getRecipe(recipeId)
     .then((recipe) => {
       res.status(200).json(recipe);

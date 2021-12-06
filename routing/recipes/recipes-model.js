@@ -6,6 +6,9 @@ module.exports = {
   getRecipe,
 };
 
+// -----------------------------------------------------
+// -----------------------------------------------------
+
 // POST a new recipe
 // helper functions for creating ingredient and steps lists
 async function createStepList(steps, recipeId) {
@@ -42,6 +45,9 @@ async function createNewRecipe(newRecipe, ingredients, steps) {
   createIngredientList(ingredients, id);
 }
 
+// -----------------------------------------------------
+// -----------------------------------------------------
+
 // GET a recipe with specified ID with all ingredients and steps.
 // helper functions to grab all steps and ingredients for a specific recipe.
 
@@ -50,7 +56,7 @@ async function getAllSteps(id) {
     .select(
       's.step_number',
       's.step_temperature_in_fahrenheit',
-      's.step_instructions'
+      's.step_instruction'
     )
     .where({ 's.recipe_id': id });
 }
@@ -58,13 +64,13 @@ async function getAllSteps(id) {
 async function getAllingredients(id) {
   return db('ingredients as i')
     .select('i.ingredient_name', 'i.ingredient_quantity')
-    .where({ 'i.recipe-id': id });
+    .where({ 'i.recipe_id': id });
 }
 
 // Recipe retrieval function
 async function getRecipe(id) {
   const recipeData = await db('recipes as r')
-    .join('users as u', 'r.creator_id', 'u.id')
+    .join('users as u', 'r.creator_id', '=', 'u.id')
     .select('r.recipe_name', 'u.username as chef', 'r.likes')
     .where({ 'r.id': id });
 
@@ -73,3 +79,8 @@ async function getRecipe(id) {
 
   return { recipeData, recipeSteps, recipeIngredients };
 }
+
+// -----------------------------------------------------
+// -----------------------------------------------------
+
+// GET all recipes
