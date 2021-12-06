@@ -14,7 +14,6 @@ module.exports = {
 async function createIngredientList(ingredients, recipeId) {
   await db('ingredients').insert(
     ingredients.map((ingredient) => {
-      console.log(ingredient);
       return {
         recipe_id: recipeId,
         ingredient_name: ingredient.ingredient_name,
