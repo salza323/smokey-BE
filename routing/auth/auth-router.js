@@ -6,14 +6,26 @@ const Users = require('../users/users-model');
 
 // pull in the secret we'll use to make the JWT
 const { jwtSecret } = require('./secrets.js');
-const { unsubscribe } = require('../../api/server');
+// const { unsubscribe } = require('../../api/a');
 
 //register a new user with email, username, & password. then respond to client with addedUser for confirmation
 router.post('/register', async (req, res) => {
   try {
-    const { email, username, location, favCooker, password } = req.body;
+    const {
+      email,
+      username,
+      city_and_state_location,
+      fav_cooker,
+      password,
+    } = req.body;
     const hash = bcrypt.hashSync(password, 10);
-    const user = { email, username, location, favCooker, password: hash };
+    const user = {
+      email,
+      username,
+      city_and_state_location,
+      fav_cooker,
+      password: hash,
+    };
     const addedUser = await Users.add(user);
     res.status(201).json(addedUser);
   } catch (err) {

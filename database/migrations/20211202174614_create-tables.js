@@ -6,6 +6,7 @@ exports.up = function (knex) {
       tbl.string('username', 128).notNullable().unique().index();
       tbl.string('password', 128).notNullable();
       tbl.string('fav_cooker', 128);
+      // TODO break down in to 2 columns
       tbl.string('city_and_state_location', 128);
     })
 
