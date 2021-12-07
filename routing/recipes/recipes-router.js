@@ -26,7 +26,7 @@ router.post('/create-recipe', restricted, (req, res) => {
 });
 
 // GET a recipe with id passed in params
-router.get('/retirive-recipe/:id', restricted, (req, res) => {
+router.get('/retirive-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
@@ -61,8 +61,9 @@ router.get('/by-likes', restricted, (req, res) => {
 });
 
 // PUT a recipe for the recipe ID matching ID passed in params
-router.put('update-recipe/:id', restricted, (req, res) => {
-  const { recipeId } = req.params.id;
+router.put('/update-recipe/:id', (req, res) => {
+  const recipeId = req.params.id;
+  console.log('recipeId', recipeId);
   const { recipe_name, creator_id, ingredients, steps } = req.body;
 
   if (!recipe_name || !creator_id || !ingredients || !steps) {
@@ -71,7 +72,7 @@ router.put('update-recipe/:id', restricted, (req, res) => {
     // Since ingredients and steps will be arrays, will need to pass in arrays to method
     // to be broken down in recipes router.
     const updatedRecipe = { recipe_name, creator_id };
-    Recipes.updatedRecipe(recipeId, updatedRecipe, ingredients, steps)
+    Recipes.updateRecipe(recipeId, updatedRecipe, ingredients, steps)
       .then((recipe) => {
         res.status(200).json(recipe);
       })
