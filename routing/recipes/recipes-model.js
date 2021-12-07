@@ -4,6 +4,7 @@ const dbConfig = require('../../database/db-config');
 module.exports = {
   createNewRecipe,
   getRecipe,
+  getAllRecipes,
 };
 
 // -----------------------------------------------------
@@ -63,7 +64,7 @@ async function getAllSteps(id) {
     .where({ 's.recipe_id': id });
 }
 
-async function getAllingredients(id) {
+async function getAllIngredients(id) {
   return db('ingredients as i')
     .select('i.ingredient_name', 'i.ingredient_quantity')
     .where({ 'i.recipe_id': id });
@@ -73,16 +74,98 @@ async function getAllingredients(id) {
 async function getRecipe(id) {
   const recipeData = await db('recipes as r')
     .join('users as u', 'r.creator_id', '=', 'u.id')
-    .select('r.recipe_name', 'u.username as chef', 'r.likes')
+    .select(
+      'r.id as recipe_id',
+      'r.recipe_name',
+      'u.id as user_id',
+      'u.username as chef',
+      'r.likes'
+    )
     .where({ 'r.id': id });
 
   const recipeSteps = await getAllSteps(id);
-  const recipeIngredients = await getAllingredients(id);
+  const recipeIngredients = await getAllIngredients(id);
 
   return { recipeData, recipeSteps, recipeIngredients };
 }
 
 // -----------------------------------------------------
 // -----------------------------------------------------
-
 // GET all recipes
+async function asyncForEach(array, callback) {
+  for (let i = 0; i < array.length; i++) {
+    await callback(array[i], array[i].id);
+  }
+}
+
+const startAsyncOperation = async (collection, dbCallback, table) => {
+  await asyncForEach(collection, async (recipe) => {
+    if (table === 'ingredients') {
+      recipe.recipeIngredients = await dbCallback(recipe.recipe_id);
+    } else if (table === 'steps') {
+      recipe.recipeSteps = await dbCallback(recipe.recipe_id);
+    }
+  });
+};
+
+async function getAllRecipes() {
+  let allRecipes = await db('recipes as r')
+    .join('users as u', 'r.creator_id', '=', 'u.id')
+    .select(
+      'r.id as recipe_id',
+      'r.recipe_name',
+      'u.id as user_id',
+      'u.username as chef',
+      'r.likes'
+    )
+    .orderBy('r.id');
+  await startAsyncOperation(allRecipes, getAllIngredients, 'ingredients');
+  await startAsyncOperation(allRecipes, getAllSteps, 'steps');
+
+  return { allRecipes };
+}
+
+// async function getAllRecipes() {
+//   const recipeObject = {
+//     recipeData: [
+//       {
+//         recipe_id: 0,
+//         recipe_name: '',
+//         user_id: 0,
+//         chef: '',
+//         likes: '',
+//       },
+//     ],
+//     recipeSteps: [
+//       {
+//         step_number: 0,
+//         step_temperature_in_fahrenheit: 0,
+//         step_instructions: '',
+//       },
+//     ],
+//     recipeIngredients: [
+//       {
+//         ingredient_name: '',
+//         ingredient_quantity: '',
+//       },
+//     ],
+//   };
+//   const allRecipes = await db('recipes as r')
+//     .select(
+//       'r.id as recipeId',
+//       'r.recipe_name',
+//       'r.creator_id',
+//       'r.likes',
+//       'i.ingredient_name',
+//       'i.ingredient_quantity'
+//     )
+//     .from('recipes as r')
+//     .leftJoin('ingredients as i', 'i.recipe_id', 'r.id')
+//     .leftJoin('steps as s', 's.recipe_id', 'r.id')
+//     .orderBy('r.id');
+
+//   // if all recipes.id matches recipe.id in step or ingredient,
+//   // then we will append that to apprropriate object
+
+//   return allRecipes;
+// }

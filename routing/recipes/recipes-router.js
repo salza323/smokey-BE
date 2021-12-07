@@ -26,12 +26,23 @@ router.post('/create-recipe', restricted, (req, res) => {
 });
 
 // GET a recipe with id passed in params
-router.get('/retirive-recipe/:id', restricted, (req, res) => {
+router.get('/retirive-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
     .then((recipe) => {
       res.status(200).json(recipe);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.message });
+    });
+});
+
+// GET all recipes in DB, ordered by id
+router.get('/retrieve-recipes', (req, res) => {
+  Recipes.getAllRecipes()
+    .then((data) => {
+      res.status(200).json(data);
     })
     .catch((err) => {
       res.status(500).json({ message: err.message });
