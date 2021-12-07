@@ -26,7 +26,7 @@ router.post('/create-recipe', restricted, (req, res) => {
 });
 
 // GET a recipe with id passed in params
-router.get('/retirive-recipe/:id', (req, res) => {
+router.get('/retirive-recipe/:id', restricted, (req, res) => {
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
@@ -39,8 +39,19 @@ router.get('/retirive-recipe/:id', (req, res) => {
 });
 
 // GET all recipes in DB, ordered by id
-router.get('/retrieve-recipes', (req, res) => {
-  Recipes.getAllRecipes()
+router.get('/', restricted, (req, res) => {
+  Recipes.getAllRecipes('r.id')
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.message });
+    });
+});
+
+// GET all recipes in DB, ordered by likes
+router.get('/by-likes', restricted, (req, res) => {
+  Recipes.getAllRecipes('r.likes', 'desc')
     .then((data) => {
       res.status(200).json(data);
     })

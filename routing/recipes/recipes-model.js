@@ -108,7 +108,12 @@ const startAsyncOperation = async (collection, dbCallback, table) => {
   });
 };
 
-async function getAllRecipes() {
+// GET all recipes in DB, ordered by id or likes, endpoints built out to passs in params
+// if ordering by ID, only one arg will be passed in, will set second arg to undefined
+// and will only order by ID,
+// if ordering by likes, likes arg and descending arg will be passed in
+async function getAllRecipes(arg1, arg2) {
+  console.log('arg', arg1, arg2);
   let allRecipes = await db('recipes as r')
     .join('users as u', 'r.creator_id', '=', 'u.id')
     .select(
@@ -118,7 +123,7 @@ async function getAllRecipes() {
       'u.username as chef',
       'r.likes'
     )
-    .orderBy('r.id');
+    .orderBy(arg1, arg2);
   await startAsyncOperation(allRecipes, getAllIngredients, 'ingredients');
   await startAsyncOperation(allRecipes, getAllSteps, 'steps');
 
