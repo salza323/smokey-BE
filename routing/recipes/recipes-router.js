@@ -83,10 +83,11 @@ router.put('/update-recipe/:id', (req, res) => {
 });
 
 // DELETE a recipe with ID passed in params
-router.delete('delete-recipe/:id', restricted, (req, res) => {
-  const { recipeId } = req.params.id;
+router.delete('/delete-recipe/:id', (req, res) => {
+  const recipeId = req.params.id;
+  console.log(recipeId);
 
-  Recipes.delete(recipeId)
+  Recipes.deleteRecipe(recipeId)
     .then(() => {
       res
         .status(200)

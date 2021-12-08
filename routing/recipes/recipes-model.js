@@ -6,6 +6,7 @@ module.exports = {
   getRecipe,
   getAllRecipes,
   updateRecipe,
+  deleteRecipe,
 };
 
 // -----------------------------------------------------
@@ -240,11 +241,21 @@ async function updateStepsList(steps) {
 async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
   console.log('updateRecipes in model');
   await db('recipes').update(updatedRecipe);
-  const result1 = await updateIngredientsList(ingredients, recipeId);
+  await db('ingredients').update(ingredients);
+  /*   const result1 = await updateIngredientsList(ingredients, recipeId);
   console.log('result1', result1);
   console.log('updateIngredients has been called');
   //   console.log('updatedIngredients', updatedIngredients);
-  //   updateStepsList(steps);
+  //   updateStepsList(steps); */
 
   return getRecipe(recipeId);
 }
+
+// -----------------------------------------------------
+// -----------------------------------------------------
+// DELETE a recipe with ID passed in params
+function deleteRecipe(id) {
+  return db('recipes').where({ 'recipes.id': id }).del();
+}
+
+// .where("id", roomId)
