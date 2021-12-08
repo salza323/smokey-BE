@@ -196,57 +196,64 @@ async function getAllRecipes(arg1, arg2) {
 //   );
 // }
 
-async function updateIngredientsList(ingredients, recipeId) {
-  console.log('ingredients', ingredients);
-  ingredients.map((ingredient) => {
-    console.log('singleIngredient', ingredient);
-    return db('ingredients')
-      .where({ id: 'ingredient.id' })
-      .update({
-        ingredient_name: ingredient.ingredient_name,
-        ingredient_quantity: ingredient.ingredient_quantity,
-      })
-      .returning('*');
+// async function updateIngredientsList(ingredients, recipeId) {
+//     console.log('ingredients', ingredients);
+//     ingredients.map((ingredient) => {
+//       console.log('singleIngredient', ingredient);
+//       return db('ingredients')
+//         .where({ 'ingredients.id': ingredient.id })
+//         .update({
+//           ingredient_name: ingredient.ingredient_name,
+//           ingredient_quantity: ingredient.ingredient_quantity,
+//         })
+//         .returning('*');
+//     })
+//     const result = await getAllIngredients(recipeId);
+//     console.log('result', result);
+//     return result;
+//   }
+
+async function updateIngredientsList(ingredients) {
+  ingredients.forEach(async (ingredient) => {
+    console.log('ingredient', ingredient);
+    const { id, ingredient_name, ingredient_quantity } = ingredient;
+    try {
+      console.log('ingredient', ingredient);
+      await db('ingredients')
+        .where({ 'ingredients.id': id })
+        .update(ingredient);
+    } catch (e) {
+      console.log(e, e.stack);
+    }
   });
-  result = await getAllIngredients(recipeId);
-  return result;
 }
 
-// async function updateIngredientsList(ingredients, recipeId) {
-//   ingredients.forEach((ingredient) => {
-//     const { id, ingredient_name, ingredient_quantity } = ingredient;
-//     console.log(id);
-//     console.log(recipeId);
-//     console.log(ingredient_name);
-//     console.log(ingredient_quantity);
-//     db('ingredients')
-//       .where({ 'ingredients.id': id })
-//       .andWhere({ 'ingredients.recipe_id': recipeId })
-//       .update({
-//         ingredient_name: ingredient_name,
-//         ingredient_quantity: ingredient_quantity,
-//       });
-//   });
-// }
-
 async function updateStepsList(steps) {
-  try {
-    await db('steps').update(steps);
-  } catch {
-    console.log('this exists');
-  }
+  steps.forEach(async (step) => {
+    const {
+      id,
+      step_number,
+      step_temperature_in_fahrenheit,
+      step_instruction,
+    } = step;
+    try {
+      await db('steps').where({ 'steps.id': id }).update(step);
+    } catch (e) {
+      console.log(e, e.stack);
+    }
+  });
 }
 
 // PUT function that will update the recipe and call ingredient and step update functions.
 async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
   console.log('updateRecipes in model');
-  await db('recipes').update(updatedRecipe);
-  await db('ingredients').update(ingredients);
-  /*   const result1 = await updateIngredientsList(ingredients, recipeId);
-  console.log('result1', result1);
+  await db('recipes').where({ 'recipes.id': recipeId }).update(updatedRecipe);
+  //   await db('ingredients')
+  //     .where({ 'ingredients.recipe_id': recipeId })
+  //     .update(ingredients);
+  await updateIngredientsList(ingredients);
   console.log('updateIngredients has been called');
-  //   console.log('updatedIngredients', updatedIngredients);
-  //   updateStepsList(steps); */
+  await updateStepsList(steps);
 
   return getRecipe(recipeId);
 }
@@ -257,5 +264,3 @@ async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
 function deleteRecipe(id) {
   return db('recipes').where({ 'recipes.id': id }).del();
 }
-
-// .where("id", roomId)
