@@ -135,7 +135,7 @@ async function getAllRecipes(arg1, arg2) {
 // helper functions for updating ingredient and steps lists
 async function updateIngredientsList(ingredients) {
   ingredients.forEach(async (ingredient) => {
-    const { id, ingredient_name, ingredient_quantity } = ingredient;
+    const id = ingredient.id;
     try {
       await db('ingredients')
         .where({ 'ingredients.id': id })
@@ -148,12 +148,7 @@ async function updateIngredientsList(ingredients) {
 
 async function updateStepsList(steps) {
   steps.forEach(async (step) => {
-    const {
-      id,
-      step_number,
-      step_temperature_in_fahrenheit,
-      step_instruction,
-    } = step;
+    const id = step.id;
     try {
       await db('steps').where({ 'steps.id': id }).update(step);
     } catch (e) {
@@ -167,7 +162,7 @@ async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
   console.log('updateRecipes in model');
   await db('recipes').where({ 'recipes.id': recipeId }).update(updatedRecipe);
 
-  // call helper functions to update the ingredients and steps
+  // call helper functions to update the ingredients and steps table columns
   await updateIngredientsList(ingredients);
   await updateStepsList(steps);
 
