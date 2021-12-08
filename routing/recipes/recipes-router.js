@@ -30,7 +30,7 @@ router.post('/create-recipe', restricted, (req, res) => {
 // -----------------------------------------------------
 // GET a recipe with id passed in params
 // -----------------------------------------------------
-router.get('/retirive-recipe/:id', (req, res) => {
+router.get('/retirive-recipe/:id', restricted, (req, res) => {
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
@@ -71,7 +71,7 @@ router.get('/by-likes', restricted, (req, res) => {
 // -----------------------------------------------------
 // PUT a recipe for the recipe ID matching ID passed in params
 // -----------------------------------------------------
-router.put('/update-recipe/:id', (req, res) => {
+router.put('/update-recipe/:id', restricted, (req, res) => {
   const recipeId = req.params.id;
   console.log('recipeId', recipeId);
   const { recipe_name, creator_id, ingredients, steps } = req.body;
@@ -95,7 +95,7 @@ router.put('/update-recipe/:id', (req, res) => {
 // -----------------------------------------------------
 // DELETE a recipe with ID passed in params
 // -----------------------------------------------------
-router.delete('/delete-recipe/:id', (req, res) => {
+router.delete('/delete-recipe/:id', restricted, (req, res) => {
   const recipeId = req.params.id;
   console.log(recipeId);
 
