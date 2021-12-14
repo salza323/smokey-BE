@@ -5,6 +5,8 @@ const db = require('../../database/db-config');
 const Recipes = require('./recipes-model');
 const restricted = require('../auth/restricted-middleware');
 
+// TODO build out test suite
+
 // -----------------------------------------------------
 // POST a new recipe
 // -----------------------------------------------------
@@ -45,8 +47,8 @@ router.get('/retirive-recipe/:id', restricted, (req, res) => {
 // -----------------------------------------------------
 // GET all recipes in DB, ordered by id
 // -----------------------------------------------------
-router.get('/', restricted, (req, res) => {
-  Recipes.getAllRecipes('r.id')
+router.get('/', (req, res) => {
+  Recipes.getAllRecipes('r.id', 'asc')
     .then((data) => {
       res.status(200).json(data);
     })
@@ -69,13 +71,29 @@ router.get('/by-likes', restricted, (req, res) => {
 });
 
 // -----------------------------------------------------
+// GET all recipes for a specific user
+// -----------------------------------------------------
+// TODO get my recipes
+router.get('/my-recipes', restricted, (req, res) => {
+  Recipes.getMyRecipes(userId)
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.message });
+    });
+});
+
+// TODO get recipes I have liked
+
+// -----------------------------------------------------
 // PUT a recipe for the recipe ID matching ID passed in params
 // -----------------------------------------------------
 router.put('/update-recipe/:id', restricted, (req, res) => {
   const recipeId = req.params.id;
-  console.log('recipeId', recipeId);
   const { recipe_name, creator_id, ingredients, steps } = req.body;
 
+  // TODO make sure that the creator_id matches user_id
   if (!recipe_name || !creator_id || !ingredients || !steps) {
     res.status(400).json({ message: 'Request body missing items!' });
   } else {
@@ -99,6 +117,7 @@ router.delete('/delete-recipe/:id', restricted, (req, res) => {
   const recipeId = req.params.id;
   console.log(recipeId);
 
+  // TODO make sure that the creator_id matches user_id
   Recipes.deleteRecipe(recipeId)
     .then(() => {
       res

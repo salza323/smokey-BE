@@ -18,7 +18,10 @@ router.post('/register', async (req, res) => {
       fav_cooker,
       password,
     } = req.body;
-    const hash = bcrypt.hashSync(password, 10);
+
+    // Create a salt and then hash password DB
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
     const user = {
       email,
       username,
@@ -37,24 +40,16 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const [user] = await Users.findBy({ username: req.body.username });
-    if (user && bcrypt.compareSync(req.body.password, user.password)) {
+    const userId = user.id;
+    if (bcrypt.compareSync(req.body.password, user.password)) {
       const token = makeToken(user);
-      res.status(200).json({ message: `Logged in!, ${user.username}`, token });
+      res.status(200).json({ token, userId });
     } else {
       res.status(401).json({ message: 'You shall not pass!' });
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-});
-
-//test for sanity purpose. can get users to check that the user exists in the db.
-router.get('/users', (req, res, next) => {
-  Users.find()
-    .then((users) => {
-      res.status(200).json(users);
-    })
-    .catch((error) => next(error));
 });
 
 //make token that will be used by client to access resticted data from db.
@@ -69,4 +64,12 @@ function makeToken(user) {
   return jwt.sign(payload, jwtSecret, options);
 }
 
+// //test for sanity purpose. can get users to check that the user exists in the db.
+// router.get('/users', (req, res, next) => {
+//   Users.find()
+//     .then((users) => {
+//       res.status(200).json(users);
+//     })
+//     .catch((error) => next(error));
+// });
 module.exports = router;

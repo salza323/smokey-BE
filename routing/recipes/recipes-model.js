@@ -25,6 +25,7 @@ async function createIngredientList(ingredients, recipeId) {
   );
 }
 
+// TODO all db is underscores or camel case, choose one!
 async function createStepList(steps, recipeId) {
   await db('steps').insert(
     steps.map((step) => {
@@ -54,14 +55,17 @@ async function createNewRecipe(newRecipe, ingredients, steps) {
 // -----------------------------------------------------
 // helper functions to grab all steps and ingredients for a specific recipe.
 async function getAllSteps(id) {
-  return db('steps as s')
-    .select(
-      's.id',
-      's.step_number',
-      's.step_temperature_in_fahrenheit',
-      's.step_instruction'
-    )
-    .where({ 's.recipe_id': id });
+  return (
+    db('steps as s')
+      .select(
+        's.id',
+        's.step_number',
+        's.step_temperature_in_fahrenheit',
+        's.step_instruction'
+      )
+      // if we change what comes in as an arg, then we can change what these methods grab
+      .where({ 's.recipe_id': id })
+  );
 }
 
 async function getAllIngredients(id) {
@@ -78,11 +82,13 @@ async function getRecipe(id) {
       'r.id as recipe_id',
       'r.recipe_name',
       'u.id as user_id',
-      'u.username as chef',
+      'u.username as username',
+      // TODO this may change bc of where likes is gonna live
       'r.likes'
     )
     .where({ 'r.id': id });
 
+  // TODO check camel v _
   const recipeSteps = await getAllSteps(id);
   const recipeIngredients = await getAllIngredients(id);
 
@@ -127,6 +133,24 @@ async function getAllRecipes(arg1, arg2) {
   await startAsyncOperation(allRecipes, getAllSteps, 'steps');
 
   return { allRecipes };
+}
+
+// -----------------------------------------------------
+// GET all recipes for a specific user
+// -----------------------------------------------------
+// TODO get my recipes
+async function getMyRecipes(userId) {
+  let myRecipes = await db('recipes as r')
+    .join('users as u', 'r.creator_id', '=', 'u.id')
+    .select(
+      'r.id as recipe_id',
+      'r.recipe_name',
+      'u.id as user_id',
+      'u.username as chef',
+      'r.likes'
+    )
+    .where({ 'r.creator_id': userId })
+    .orderBy('r.id', 'asc');
 }
 
 // -----------------------------------------------------
