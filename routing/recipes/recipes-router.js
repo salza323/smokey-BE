@@ -137,7 +137,6 @@ router.delete('/delete-recipe/:id', (req, res) => {
 // -----------------------------------------------------
 router.put('/add-like/:id', (req, res) => {
   const recipeId = req.params.id;
-  console.log(recipeId);
 
   Recipes.addLike(recipeId)
     .then(() => {
