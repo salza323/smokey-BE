@@ -10,7 +10,8 @@ const restricted = require('../auth/restricted-middleware');
 // -----------------------------------------------------
 // POST a new recipe
 // -----------------------------------------------------
-router.post('/create-recipe', restricted, (req, res) => {
+router.post('/create-recipe', (req, res) => {
+  console.log(req.body);
   const { recipe_name, creator_id, ingredients, steps } = req.body;
 
   if (!recipe_name || !creator_id || !ingredients || !steps) {
@@ -32,7 +33,7 @@ router.post('/create-recipe', restricted, (req, res) => {
 // -----------------------------------------------------
 // GET a recipe with id passed in params
 // -----------------------------------------------------
-router.get('/retirive-recipe/:id', restricted, (req, res) => {
+router.get('/retirive-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
@@ -60,7 +61,7 @@ router.get('/', (req, res) => {
 // -----------------------------------------------------
 // GET all recipes in DB, ordered by likes
 // -----------------------------------------------------
-router.get('/by-likes', restricted, (req, res) => {
+router.get('/by-likes', (req, res) => {
   Recipes.getAllRecipes('r.likes', 'desc')
     .then((data) => {
       res.status(200).json(data);
@@ -89,9 +90,11 @@ router.get('/my-recipes', restricted, (req, res) => {
 // -----------------------------------------------------
 // PUT a recipe for the recipe ID matching ID passed in params
 // -----------------------------------------------------
-router.put('/update-recipe/:id', restricted, (req, res) => {
+router.put('/update-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
+  console.log(recipeId);
   const { recipe_name, creator_id, ingredients, steps } = req.body;
+  console.log('req.body', req.body);
 
   // TODO make sure that the creator_id matches user_id
   if (!recipe_name || !creator_id || !ingredients || !steps) {
@@ -113,7 +116,7 @@ router.put('/update-recipe/:id', restricted, (req, res) => {
 // -----------------------------------------------------
 // DELETE a recipe with ID passed in params
 // -----------------------------------------------------
-router.delete('/delete-recipe/:id', restricted, (req, res) => {
+router.delete('/delete-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
   console.log(recipeId);
 
