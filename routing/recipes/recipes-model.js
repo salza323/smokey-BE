@@ -25,7 +25,6 @@ async function createIngredientList(ingredients, recipeId) {
   );
 }
 
-// TODO all db is underscores or camel case, choose one!
 async function createStepList(steps, recipeId) {
   await db('steps').insert(
     steps.map((step) => {
@@ -83,12 +82,10 @@ async function getRecipe(id) {
       'r.recipe_name',
       'u.id as user_id',
       'u.username as username',
-      // TODO this may change bc of where likes is gonna live
       'r.likes'
     )
     .where({ 'r.id': id });
 
-  // TODO check camel v _
   const recipeSteps = await getAllSteps(id);
   const recipeIngredients = await getAllIngredients(id);
 
@@ -107,6 +104,8 @@ async function asyncForEach(array, callback) {
 const startAsyncOperation = async (collection, dbCallback, table) => {
   await asyncForEach(collection, async (recipe) => {
     if (table === 'ingredients') {
+      //  TODO make sure everyone shares the same naming conventions
+      //   recipe.ingredients = await dbCallback(recipe.recipe_id);
       recipe.recipeIngredients = await dbCallback(recipe.recipe_id);
     } else if (table === 'steps') {
       recipe.recipeSteps = await dbCallback(recipe.recipe_id);
@@ -124,7 +123,7 @@ async function getAllRecipes(arg1, arg2) {
     .select(
       'r.id as recipe_id',
       'r.recipe_name',
-      'u.id as user_id',
+      'u.id as creator_id',
       'u.username as chef',
       'r.likes'
     )
@@ -157,26 +156,45 @@ async function getMyRecipes(userId) {
 // PUT a recipe for the recipe ID matching ID passed in params
 // -----------------------------------------------------
 // helper functions for updating ingredient and steps lists
-async function updateIngredientsList(ingredients) {
-  ingredients.forEach(async (ingredient) => {
+async function updateIngredientsList(ingredients, recipeId) {
+  ingredients.map(async (ingredient) => {
     const id = ingredient.id;
-    try {
-      await db('ingredients')
-        .where({ 'ingredients.id': id })
-        .update(ingredient);
-    } catch (e) {
-      console.log(e, e.stack);
+    // Check if the ingredient exists. If it does not, insert in to table.
+    if (id) {
+      try {
+        await db('ingredients')
+          .where({ 'ingredients.id': id })
+          .update(ingredient);
+      } catch (e) {
+        console.log(e, e.stack);
+      }
+    } else {
+      await db('ingredients').insert({
+        recipe_id: recipeId,
+        ingredient_name: ingredient.ingredient_name,
+        ingredient_quantity: ingredient.ingredient_quantity,
+      });
     }
   });
 }
 
-async function updateStepsList(steps) {
-  steps.forEach(async (step) => {
+async function updateStepsList(steps, recipeId) {
+  steps.map(async (step) => {
     const id = step.id;
-    try {
-      await db('steps').where({ 'steps.id': id }).update(step);
-    } catch (e) {
-      console.log(e, e.stack);
+    // Check if the step exists. If it does not, insert in to table.
+    if (id) {
+      try {
+        await db('steps').where({ 'steps.id': id }).update(step);
+      } catch (e) {
+        console.log(e, e.stack);
+      }
+    } else {
+      await db('steps').insert({
+        recipe_id: recipeId,
+        step_number: step.step_number,
+        step_temperature_in_fahrenheit: step.step_temperature_in_fahrenheit,
+        step_instruction: step.step_instruction,
+      });
     }
   });
 }
@@ -187,8 +205,8 @@ async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
   await db('recipes').where({ 'recipes.id': recipeId }).update(updatedRecipe);
 
   // call helper functions to update the ingredients and steps table columns
-  await updateIngredientsList(ingredients);
-  await updateStepsList(steps);
+  await updateIngredientsList(ingredients, recipeId);
+  await updateStepsList(steps, recipeId);
 
   // already built out function to grab a recipe, so will just use that to return the recipe that was just updated
   return getRecipe(recipeId);
