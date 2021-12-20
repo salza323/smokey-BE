@@ -7,6 +7,7 @@ module.exports = {
   getAllRecipes,
   updateRecipe,
   deleteRecipe,
+  addLike,
 };
 
 // -----------------------------------------------------
@@ -217,4 +218,20 @@ async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
 // -----------------------------------------------------
 function deleteRecipe(id) {
   return db('recipes').where({ 'recipes.id': id }).del();
+}
+
+// -----------------------------------------------------
+// PUT a recipe like count with ID passed in params
+// -----------------------------------------------------
+async function addLike(id) {
+  try {
+    const existingRecipe = await getRecipe(id);
+    if (existingRecipe.recipeData.likes === null) {
+      return db('recipes').where({ 'recipes.id': id }).update('likes', 1);
+    } else {
+      return db('recipes').where({ 'recipes.id': id }).increment('likes', 1);
+    }
+  } catch (err) {
+    console.log(err);
+  }
 }
