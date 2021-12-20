@@ -33,7 +33,7 @@ router.post('/create-recipe', (req, res) => {
 // -----------------------------------------------------
 // GET a recipe with id passed in params
 // -----------------------------------------------------
-router.get('/retirive-recipe/:id', (req, res) => {
+router.get('/retrieve-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
@@ -126,6 +126,23 @@ router.delete('/delete-recipe/:id', (req, res) => {
       res
         .status(200)
         .json({ message: 'Recipe with id ' + recipeId + ' has been deleted' });
+    })
+    .catch((err) => {
+      res.status(500).json({ message: err.message });
+    });
+});
+
+// -----------------------------------------------------
+// PUT a recipe like count with ID passed in params
+// -----------------------------------------------------
+router.put('/add-like/:id', (req, res) => {
+  const recipeId = req.params.id;
+
+  Recipes.addLike(recipeId)
+    .then(() => {
+      res
+        .status(200)
+        .json({ message: 'Like has been added to recipe with id ' + recipeId });
     })
     .catch((err) => {
       res.status(500).json({ message: err.message });
