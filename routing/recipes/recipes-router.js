@@ -38,7 +38,13 @@ router.get('/retrieve-recipe/:id', (req, res) => {
 
   Recipes.getRecipe(recipeId)
     .then((recipe) => {
-      res.status(200).json(recipe);
+      if (recipe) {
+        res.status(200).json(recipe);
+      } else {
+        res
+          .status(404)
+          .json({ message: `Unable to find recipe with id: ${recipeId}` });
+      }
     })
     .catch((err) => {
       res.status(500).json({ message: err.message });
@@ -93,7 +99,8 @@ router.get('/my-recipes', restricted, (req, res) => {
 router.put('/update-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
   console.log(recipeId);
-  const { recipe_name, creator_id, ingredients, steps } = req.body;
+  const { recipe_name, user_id, ingredients, steps } = req.body;
+  const creator_id = user_id;
   console.log('req.body', req.body);
 
   // TODO make sure that the creator_id matches user_id
@@ -116,7 +123,7 @@ router.put('/update-recipe/:id', (req, res) => {
 // -----------------------------------------------------
 // DELETE a recipe with ID passed in params
 // -----------------------------------------------------
-router.delete('/delete-recipe/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
   const recipeId = req.params.id;
   console.log(recipeId);
 
