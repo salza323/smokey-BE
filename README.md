@@ -5,3 +5,6 @@
 ### `npm install`
 
 ### `npm run server`
+
+## Will also need to clone the React frontend repository and run command lines as listed located [here](https://github.com/salza323/smokey-FE) 
+
