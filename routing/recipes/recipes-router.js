@@ -11,9 +11,8 @@ const restricted = require('../auth/restricted-middleware');
 // POST a new recipe
 // -----------------------------------------------------
 router.post('/create-recipe', (req, res) => {
-  console.log(req.body);
   const { recipe_name, creator_id, ingredients, steps } = req.body;
-
+  // TODO grab userId from jwt
   if (!recipe_name || !creator_id || !ingredients || !steps) {
     res.status(400).json({ message: 'Request body missing items!' });
   } else {
@@ -34,6 +33,7 @@ router.post('/create-recipe', (req, res) => {
 // GET a recipe with id passed in params
 // -----------------------------------------------------
 router.get('/retrieve-recipe/:id', (req, res) => {
+  console.log(req.headers);
   const recipeId = req.params.id;
 
   Recipes.getRecipe(recipeId)
@@ -55,7 +55,7 @@ router.get('/retrieve-recipe/:id', (req, res) => {
 // GET all recipes in DB, ordered by id
 // -----------------------------------------------------
 router.get('/', (req, res) => {
-  Recipes.getAllRecipes('r.id', 'asc')
+  Recipes.getAllRecipes('r.id', 'desc')
     .then((data) => {
       res.status(200).json(data);
     })
@@ -98,10 +98,8 @@ router.get('/my-recipes', restricted, (req, res) => {
 // -----------------------------------------------------
 router.put('/update-recipe/:id', (req, res) => {
   const recipeId = req.params.id;
-  console.log(recipeId);
   const { recipe_name, user_id, ingredients, steps } = req.body;
   const creator_id = user_id;
-  console.log('req.body', req.body);
 
   // TODO make sure that the creator_id matches user_id
   if (!recipe_name || !creator_id || !ingredients || !steps) {
@@ -144,7 +142,6 @@ router.delete('/:id', (req, res) => {
 // -----------------------------------------------------
 router.put('/add-like/:id', (req, res) => {
   const recipeId = req.params.id;
-  console.log(recipeId);
 
   Recipes.addLike(recipeId)
     .then(() => {

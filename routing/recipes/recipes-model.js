@@ -218,7 +218,6 @@ async function updateStepsList(steps, recipeId) {
 
 // PUT function that will update the recipe and call ingredient and step update functions.
 async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
-  console.log('updateRecipes in model');
   await db('recipes').where({ 'recipes.id': recipeId }).update(updatedRecipe);
 
   // call helper functions to update the ingredients and steps table columns
