@@ -76,7 +76,9 @@ async function getAllIngredients(id) {
 
 // Recipe retrieval function
 async function getRecipe(id) {
-  const recipeData = await db('recipes as r')
+  let queryResult = null;
+
+  const recipe = await db('recipes as r')
     .join('users as u', 'r.creator_id', '=', 'u.id')
     .select(
       'r.id as recipe_id',
@@ -85,12 +87,21 @@ async function getRecipe(id) {
       'u.username as username',
       'r.likes'
     )
-    .where({ 'r.id': id });
+    .where({ 'r.id': id })
+    .first();
 
-  const recipeSteps = await getAllSteps(id);
-  const recipeIngredients = await getAllIngredients(id);
+  if (recipe) {
+    const recipeSteps = await getAllSteps(id);
+    const recipeIngredients = await getAllIngredients(id);
+    queryResult = {
+      ...recipe,
+      steps: recipeSteps,
+      ingredients: recipeIngredients,
+    };
+  }
 
-  return { recipeData, recipeSteps, recipeIngredients };
+  // return { recipeData, recipeSteps, recipeIngredients };
+  return queryResult;
 }
 
 // -----------------------------------------------------
@@ -151,6 +162,11 @@ async function getMyRecipes(userId) {
     )
     .where({ 'r.creator_id': userId })
     .orderBy('r.id', 'asc');
+
+  await startAsyncOperation(myRecipes, getAllIngredients, 'ingredients');
+  await startAsyncOperation(myRecipes, getAllSteps, 'steps');
+
+  return { myRecipes };
 }
 
 // -----------------------------------------------------
@@ -202,7 +218,6 @@ async function updateStepsList(steps, recipeId) {
 
 // PUT function that will update the recipe and call ingredient and step update functions.
 async function updateRecipe(recipeId, updatedRecipe, ingredients, steps) {
-  console.log('updateRecipes in model');
   await db('recipes').where({ 'recipes.id': recipeId }).update(updatedRecipe);
 
   // call helper functions to update the ingredients and steps table columns
@@ -226,7 +241,7 @@ function deleteRecipe(id) {
 async function addLike(id) {
   try {
     const existingRecipe = await getRecipe(id);
-    if (existingRecipe.recipeData.likes === null) {
+    if (existingRecipe.likes === null) {
       return db('recipes').where({ 'recipes.id': id }).update('likes', 1);
     } else {
       return db('recipes').where({ 'recipes.id': id }).increment('likes', 1);
